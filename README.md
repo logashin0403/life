@@ -13,7 +13,7 @@
 Все импорты:
    - from cell import Cell - импорт класса клетки в main файл
    - from copy import deepcopy - импорт функции глубокого копирования. Используется для массивов при проверке и пересчёте состояний
-   - from field import Field - импорт класса игрового поля в main файл\
+   - from field import Field - импорт класса игрового поля в main файл
    - from random import randint - используется для поулчения рандомного состояния (0 или 1)
    - from tkinter import Tk, Canvas - используется для визуализации
 
