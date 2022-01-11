@@ -97,6 +97,7 @@ def check_platform_and_draw_cells(root, canvas, platform, x_size, y_size, array)
 
 
 def main():
+    print("Необходимо ввести x и y в пределах от 8 до 100")
     try:
         x_size = int(input("Write x:"))
         y_size = int(input("Write y:"))
