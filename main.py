@@ -1,8 +1,9 @@
 from cell import Cell
 from copy import deepcopy
 from field import Field
-import pygame
 from random import randint
+from tkinter import Tk, Canvas
+
 
 WIDTH = 1600
 HEIGHT = 900
@@ -19,24 +20,18 @@ def check_size(x, y):
         exit()
 
 
-def create_new_game():
+def create_new_game(root, canvas, platform, x_size, y_size):
     """
             Это процедура, которая запускает основной игровой цикл
     """
 
     while True:
-        screen.fill(pygame.Color('black'))
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                exit()
-        current_array_of_cells = deepcopy(platform_one.get_collection())
-        check_platform_and_draw_cells(current_array_of_cells)
-
-        clock.tick(10)
-        pygame.display.flip()
+        canvas.delete("all")
+        current_array_of_cells = deepcopy(platform.get_collection())
+        check_platform_and_draw_cells(root, canvas, platform, x_size, y_size, current_array_of_cells)
 
 
-def create_new_platform():
+def create_new_platform(x_size, y_size):
     """
             Это функция, которая создаёт основной массив всех клеток для игрового поля
             Возвращает массив всех клеток
@@ -54,17 +49,23 @@ def create_new_platform():
     return array_of_all_cells
 
 
-def check_platform_and_draw_cells(array):
+def check_platform_and_draw_cells(root, canvas, platform, x_size, y_size, array):
     """
                 Это процедура, которая проверяет вложенным циклом все клетки исходя из правил игры, вносит изменения
                 в массив всех клеток, а также выводит на экран каждую живую клетку
     """
 
     for i in range(x_size):
+        prev_y = i * (HEIGHT / y_size)
         for j in range(y_size):
             if array[i][j].get_condition():
-                pygame.draw.rect(screen, pygame.Color('green'), (WIDTH / x_size * j, HEIGHT / y_size * i,
-                                                                 WIDTH / x_size - 1, HEIGHT / y_size - 1))  # x y w h
+                prev_x = j * (WIDTH / x_size)
+
+                canvas.create_rectangle(prev_x, prev_y,
+                                        prev_x + WIDTH / x_size, prev_y + HEIGHT / y_size,
+                                        outline="black", fill="green"
+                                        )  # прорисовка прямоугольников x1 y1 x2 y2
+
             count = 0  # количество соседей
 
             if i > 0:
@@ -87,24 +88,32 @@ def check_platform_and_draw_cells(array):
                 count += array[i][j + 1].get_condition()
 
             if count not in (2, 3):
-                platform_one.get_collection()[i][j].set_condition(0)
+                platform.get_collection()[i][j].set_condition(0)
             else:
                 if count == 3:
-                    platform_one.get_collection()[i][j].set_condition(1)
+                    platform.get_collection()[i][j].set_condition(1)
+
+    root.update()  # обновление окна
 
 
-try:
-    x_size = int(input("Write x:"))
-    y_size = int(input("Write y:"))
-except ValueError:
-    print("Похоже вы ввели не числа...")
-    exit()
+def main():
+    try:
+        x_size = int(input("Write x:"))
+        y_size = int(input("Write y:"))
+    except ValueError:
+        print("Похоже вы ввели не числа...")
+        exit()
 
-check_size(x_size, y_size)
+    check_size(x_size, y_size)
 
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
+    root = Tk()
+    root.geometry("1600x900+100+100")
+    canvas = Canvas(root, width=1600, height=900, bg='black')
+    canvas.pack()
 
-platform_one = Field(create_new_platform())  # инициализация нового игрового поля
-create_new_game()  # запуск основого процесса игры
+    platform = Field(create_new_platform(x_size, y_size))  # инициализация нового игрового поля
+    create_new_game(root, canvas, platform, x_size, y_size)  # запуск основого процесса игры
+
+
+if __name__ == "__main__":
+    main()
